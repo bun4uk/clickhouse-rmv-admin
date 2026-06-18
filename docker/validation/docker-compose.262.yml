@@ -1,0 +1,35 @@
+# Throwaway stack to prove the backend works against ClickHouse 26.2 (Cloud max).
+# Reuses the already-built backend image and the same demo init SQL. Alt ports.
+services:
+  ch262:
+    image: clickhouse/clickhouse-server:26.2
+    container_name: rmv_ch262
+    ports:
+      - "28123:8123"
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+    volumes:
+      - ../clickhouse/init:/docker-entrypoint-initdb.d
+      - ../clickhouse/config/users.xml:/etc/clickhouse-server/users.d/users.xml
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend262:
+    image: rmv_admin-backend:latest
+    container_name: rmv_backend262
+    ports:
+      - "8002:8000"
+    environment:
+      - CLICKHOUSE_HOST=ch262
+      - CLICKHOUSE_PORT=8123
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+      - CLICKHOUSE_DATABASE=default
+      - DEFAULT_DATABASES=rmv_demo,rmv_v2
+      - DISPLAY_TIMEZONE=Europe/Kyiv
+    depends_on:
+      ch262:
+        condition: service_healthy

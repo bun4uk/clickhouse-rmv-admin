@@ -1,0 +1,26 @@
+{
+  "name": "rmv-admin",
+  "version": "1.0.0",
+  "description": "ClickHouse Refreshable Materialized Views Admin Tool",
+  "scripts": {
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "dev:backend": "cd backend && python main.py",
+    "dev:frontend": "cd frontend && npm start",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "test:connection": "cd backend && python test_connection.py"
+  },
+  "keywords": [
+    "clickhouse",
+    "materialized-views",
+    "rmv",
+    "admin",
+    "ui"
+  ],
+  "author": "",
+  "license": "MIT"
+}

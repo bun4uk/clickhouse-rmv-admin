@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.venv
+*.egg-info
+.installed.cfg
+*.egg
+.env
+.env.local
+_verify_v2.py
+test_connection.py

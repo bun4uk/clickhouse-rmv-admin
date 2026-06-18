@@ -1,0 +1,63 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:26.5
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      - CLICKHOUSE_DB=default
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./docker/clickhouse/init:/docker-entrypoint-initdb.d
+      - ./docker/clickhouse/config/users.xml:/etc/clickhouse-server/users.d/users.xml
+    networks:
+      - rmv-network
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=8123
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+      - CLICKHOUSE_DATABASE=default
+      - CLICKHOUSE_SECURE=false
+      - DEFAULT_DATABASES=rmv_demo,rmv_v2
+      - POLL_INTERVAL_SECONDS=15
+      - QUERY_LOG_CLUSTER=
+      - DISPLAY_TIMEZONE=Europe/Kyiv
+    networks:
+      - rmv-network
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - rmv-network
+    restart: unless-stopped
+
+networks:
+  rmv-network:
+    driver: bridge
+
+volumes:
+  clickhouse-data:
