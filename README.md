@@ -11,6 +11,8 @@ A small web tool to **visualize, monitor and control** [Refreshable Materialized
 
 Targets a modern ClickHouse and was validated live against **26.2** and **26.5**.
 
+![RMV Admin — dependency graph, dashboard and the per-view details panel](docs/screenshot.png)
+
 ---
 
 ## Architecture
