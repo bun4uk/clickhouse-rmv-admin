@@ -58,6 +58,8 @@ docker run -p 8088:8000 \
 # open http://localhost:8088
 ```
 
+For a Compose-based self-host against your own ClickHouse, use [`docker-compose.example.yml`](docker-compose.example.yml) (no bundled database).
+
 ### Local demo (with a bundled ClickHouse)
 
 ```bash

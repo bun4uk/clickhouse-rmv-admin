@@ -1,0 +1,25 @@
+# Self-hosted deployment against your OWN ClickHouse (no bundled database).
+#
+#   1. Copy this file:            cp docker-compose.example.yml docker-compose.yml
+#      (or run it directly:       docker compose -f docker-compose.example.yml up -d)
+#   2. Fill in the CLICKHOUSE_* values below.
+#   3. Open http://localhost:8088
+#
+# Uses the prebuilt single image — nothing is built locally.
+services:
+  app:
+    image: ghcr.io/bun4uk/clickhouse-rmv-admin:0.1.0   # or :latest
+    ports:
+      - "8088:8000"            # host:container — change the host port if 8088 is taken
+    environment:
+      - CLICKHOUSE_HOST=your-clickhouse-host
+      - CLICKHOUSE_PORT=8123             # 8443 for ClickHouse Cloud
+      - CLICKHOUSE_USER=rmv_ui_svc       # service user (see README for grants)
+      - CLICKHOUSE_PASSWORD=change-me
+      - CLICKHOUSE_DATABASE=default
+      - CLICKHOUSE_SECURE=false          # true for ClickHouse Cloud (HTTPS)
+      - DEFAULT_DATABASES=               # e.g. db1,db2  (empty = all databases)
+      - POLL_INTERVAL_SECONDS=15
+      - QUERY_LOG_CLUSTER=               # e.g. "default" on Cloud — history across replicas
+      - DISPLAY_TIMEZONE=UTC
+    restart: unless-stopped
