@@ -55,6 +55,15 @@ The bundled `clickhouse` service ships demo RMVs (`docker/clickhouse/init/`) so 
 
 To point at your **own** ClickHouse instead, edit the `backend` environment in `docker-compose.yml` (see below) and remove/disable the bundled `clickhouse` service.
 
+### Prebuilt images
+
+Multi-arch images (`linux/amd64`, `linux/arm64`) are published to GitHub Container Registry on every push to `main`:
+
+```
+ghcr.io/bun4uk/clickhouse-rmv-admin/backend:latest
+ghcr.io/bun4uk/clickhouse-rmv-admin/frontend:latest
+```
+
 ---
 
 ## Configuration
