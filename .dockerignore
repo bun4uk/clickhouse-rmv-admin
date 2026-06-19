@@ -1,0 +1,17 @@
+# Build context is the repo root. Keep it lean and reproducible.
+.git
+.github
+**/node_modules
+**/dist
+**/.vite
+**/__pycache__
+**/*.pyc
+**/.venv
+**/venv
+.env
+**/.env
+docs
+*.md
+SPEC_v2_REVIEW.md
+.DS_Store
+*.log

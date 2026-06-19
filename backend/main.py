@@ -1,11 +1,14 @@
+import os
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from clickhouse_client import ClickHouseError, clickhouse_client
 from config import settings
 
-app = FastAPI(title="RMV Admin API", version="2.0.0")
+app = FastAPI(title="RMV Admin API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,11 +31,6 @@ def _handle(fn, *args, **kwargs):
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/")
-async def root():
-    return {"message": "RMV Admin API", "version": "2.0.0"}
 
 
 @app.get("/api/config")
@@ -113,6 +111,14 @@ async def health():
         }
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
+
+
+# Serve the built frontend (single-image deployment): FastAPI serves the SPA
+# and /api on the same origin/port. Mounted last so /api/* routes win. In local
+# dev the SPA runs separately via Vite, so this only activates if the bundle exists.
+_static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.isdir(_static_dir):
+    app.mount("/", StaticFiles(directory=_static_dir, html=True), name="spa")
 
 
 if __name__ == "__main__":

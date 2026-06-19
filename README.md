@@ -18,10 +18,10 @@ Targets a modern ClickHouse and was validated live against **26.2** and **26.5**
 ## Architecture
 
 ```
-Browser ──HTTP──> nginx (frontend, :3000) ──/api──> FastAPI (backend, :8000) ──> ClickHouse
+Browser ──HTTP──> FastAPI (serves the SPA + /api) ──> ClickHouse
 ```
 
-The browser never talks to ClickHouse directly — all access goes through the backend, which connects with a service user that needs only read access to a few `system` tables plus the `SYSTEM VIEWS` grant.
+Shipped as a **single image**: one process (uvicorn) serves both the built React SPA and the `/api`. The browser never talks to ClickHouse directly — all access goes through the backend, which connects with a service user that needs only read access to a few `system` tables plus the `SYSTEM VIEWS` grant.
 
 **Stack:** FastAPI + `clickhouse-connect` · React 19 + Vite + `@xyflow/react` (React Flow) + `@dagrejs/dagre` + TanStack Query + Zustand + Tailwind CSS.
 
@@ -37,7 +37,8 @@ frontend/               React + Vite SPA
   src/components/       graph (xyflow), dashboard, details panel, ui kit
   src/lib/              status/time formatting, helpers
 docker/clickhouse/init/ demo RMVs (DEPENDS ON chain, APPEND, failing view)
-docker-compose.yml      clickhouse + backend + frontend
+Dockerfile              single all-in-one image (SPA built, served by FastAPI)
+docker-compose.yml      clickhouse + app (for the local demo)
 SPEC_v2_REVIEW.md       technical analysis of ClickHouse RMV behaviour
 ```
 
@@ -45,24 +46,26 @@ SPEC_v2_REVIEW.md       technical analysis of ClickHouse RMV behaviour
 
 ## Quick start
 
+### Run the prebuilt image
+
+One multi-arch (`linux/amd64`, `linux/arm64`) image, published to GitHub Container Registry:
+
+```bash
+docker run -p 8088:8000 \
+  -e CLICKHOUSE_HOST=your-host -e CLICKHOUSE_PORT=8123 \
+  -e CLICKHOUSE_USER=default -e CLICKHOUSE_PASSWORD=... \
+  ghcr.io/bun4uk/clickhouse-rmv-admin:latest
+# open http://localhost:8088
+```
+
+### Local demo (with a bundled ClickHouse)
+
 ```bash
 docker compose up -d --build
-# UI:      http://localhost:3000
-# API:     http://localhost:8000/api
+# open http://localhost:8088
 ```
 
 The bundled `clickhouse` service ships demo RMVs (`docker/clickhouse/init/`) so the graph isn't empty on first run: a `DEPENDS ON` chain, an `APPEND` view, and a deliberately failing view.
-
-To point at your **own** ClickHouse instead, edit the `backend` environment in `docker-compose.yml` (see below) and remove/disable the bundled `clickhouse` service.
-
-### Prebuilt images
-
-Multi-arch images (`linux/amd64`, `linux/arm64`) are published to GitHub Container Registry on every push to `main`:
-
-```
-ghcr.io/bun4uk/clickhouse-rmv-admin/backend:latest
-ghcr.io/bun4uk/clickhouse-rmv-admin/frontend:latest
-```
 
 ---
 

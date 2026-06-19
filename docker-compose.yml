@@ -19,12 +19,13 @@ services:
       retries: 5
     restart: unless-stopped
 
-  backend:
+  # Single all-in-one app image (FastAPI serves API + built SPA).
+  app:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+    image: ghcr.io/bun4uk/clickhouse-rmv-admin:latest
     ports:
-      - "8000:8000"
+      - "8088:8000"   # open http://localhost:8088
     environment:
       - CLICKHOUSE_HOST=clickhouse
       - CLICKHOUSE_PORT=8123
@@ -41,18 +42,6 @@ services:
     depends_on:
       clickhouse:
         condition: service_healthy
-    restart: unless-stopped
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    networks:
-      - rmv-network
     restart: unless-stopped
 
 networks:
