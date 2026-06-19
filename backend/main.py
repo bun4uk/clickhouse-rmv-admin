@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from clickhouse_client import ClickHouseError, clickhouse_client
 from config import settings
 
-app = FastAPI(title="RMV Admin API", version="0.1.0")
+app = FastAPI(title="RMV Admin API", version="0.1.1")
 
 app.add_middleware(
     CORSMiddleware,

@@ -8,7 +8,7 @@
 # Uses the prebuilt single image — nothing is built locally.
 services:
   app:
-    image: ghcr.io/bun4uk/clickhouse-rmv-admin:0.1.0   # or :latest
+    image: ghcr.io/bun4uk/clickhouse-rmv-admin:0.1.1   # or :latest, or bun4uk/clickhouse-rmv-admin (Docker Hub)
     ports:
       - "8088:8000"            # host:container — change the host port if 8088 is taken
     environment:
